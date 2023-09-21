@@ -76,9 +76,16 @@ tkn pr describe --last -o jsonpath={.metadata.annotations} | jq
 echo "opc results list --insecure --addr ${RESULTS_API} ${NAMESPACE}"
 opc results list --insecure --addr ${RESULTS_API} ${NAMESPACE}
 
+echo
 echo "opc results records list --insecure --addr ${RESULTS_API} results-testing/results/TR_UUID"
+
+echo
 echo "opc results records get --insecure --addr ${RESULTS_API} results-testing/results/TR_UUID/records/RECORD_UUID  | jq -r .data.value | base64 -d | yq -P '.'"
+
+echo
 echo "opc results logs list --insecure --addr ${RESULTS_API} results-testing/results/TR_UUID"
+
+echo
 echo "opc results logs get --insecure --addr ${RESULTS_API} results-testing/results/TR_UUID/logs/RECORD_UUID  | jq -r .data | base64 -d"
 
 
