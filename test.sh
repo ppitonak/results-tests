@@ -57,9 +57,13 @@ EOF
 
 oc create route -n ${NAMESPACE} passthrough tekton-results-api-service --service=tekton-results-api-service --port=8080
 
-oc get tektonresults.operator.tekton.dev,tektoninstallerset
+oc wait --for=condition=Ready tektoninstallerset -l operator.tekton.dev/type=result
+
+oc get tektonresults.operator.tekton.dev
 
 RESULTS_API=$(oc get route  tekton-results-api-service -n openshift-pipelines --no-headers -o custom-columns=":spec.host"):443
+
+#oc login -u user -p user
 
 export NAMESPACE=results-testing
 oc new-project $NAMESPACE
