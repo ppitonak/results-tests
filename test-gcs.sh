@@ -19,9 +19,6 @@ oc create secret tls -n ${NAMESPACE} tekton-results-tls --cert=cert.pem --key=ke
 # echo "Creating Google Cloud Storage credentials"
 oc create secret generic gcs-credentials --from-file=$HOME/.config/gcloud/application_default_credentials.json -n openshift-pipelines
 
-BUCKET_NAME=results-$(date +"%m%d%H%M%S")
-echo "GCS bucket name: $BUCKET_NAME"
-
 echo "Creating TektonResult CR"
 cat <<EOF | oc apply -f -
 apiVersion: operator.tekton.dev/v1alpha1
@@ -36,7 +33,7 @@ spec:
   db_user: result
   db_host: tekton-results-postgres-service.openshift-pipelines.svc.cluster.local
   logs_path: /logs
-  logs_type: File
+  logs_type: GCS
   logs_buffer_size: 2097152
   auth_disable: true
   tls_hostname_override: tekton-results-api-service.openshift-pipelines.svc.cluster.local
@@ -45,7 +42,7 @@ spec:
   prometheus_port: 9090
   gcs_creds_secret_name: gcs-credentials
   gcs_creds_secret_key: application_default_credentials.json 
-  gcs_bucket_name: $BUCKET_NAME 
+  gcs_bucket_name: results-testing
 EOF
 
 oc create route -n ${NAMESPACE} passthrough tekton-results-api-service --service=tekton-results-api-service --port=8080
@@ -64,6 +61,7 @@ oc new-project $NAMESPACE
 # create one task run and two pipeline runs
 oc create -f task-output-image.yaml
 tkn tr logs -f --last
+sleep 10
 tkn tr describe --last -o jsonpath={.metadata.annotations} | jq
 
 #oc create -f pipeline.yaml
