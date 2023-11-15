@@ -5,8 +5,6 @@ set +x
 export NAMESPACE="openshift-pipelines"
 
 oc create secret generic tekton-results-postgres -n ${NAMESPACE} --from-literal=POSTGRES_USER=result --from-literal=POSTGRES_PASSWORD=$(openssl rand -base64 20)
-#oc create secret generic tekton-results-postgres -n ${NAMESPACE} --from-literal=POSTGRES_USER=postgres --from-literal=POSTGRES_PASSWORD=$(openssl rand -base64 20)
-#oc create secret generic tekton-results-postgres -n ${NAMESPACE} --from-literal=POSTGRESQL_USER=postgres --from-literal=POSTGRESQL_PASSWORD=$(openssl rand -base64 20) --from-literal=POSTGRESQL_DATABASE=results
 
 echo "Generating TLS certificate"
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes \
@@ -30,7 +28,6 @@ spec:
   logs_api: true
   log_level: debug
   db_port: 5432
-  db_user: result
   db_host: tekton-results-postgres-service.openshift-pipelines.svc.cluster.local
   logs_path: /logs
   logs_type: GCS
